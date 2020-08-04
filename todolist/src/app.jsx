@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import TaskForm from './components/task-form';
 import Title from './components/title.jsx';
 import NavBar from './components/navbar.jsx';
 import TaskList from './components/task-list.jsx';
 import Alert from './components/alert.jsx';
+import { fetchData, addTask, deleteTask } from './service/api.js';
 
 const OPTIONS = [
   {
@@ -13,93 +14,75 @@ const OPTIONS = [
   },
   {
     name: 'Complete',
-    filter: ({ complete }) => complete
+    filter: ({ isComplete }) => isComplete === true
   },
   {
     name: 'Incomplete',
-    filter: ({ complete }) => !complete
+    filter: ({ isComplete }) => isComplete === false
   }
 ]
 
-class App extends React.Component {
-  
-  constructor(props) {
-    super(props);
+const App = () => {
 
-    this.state = {
-      tasks: [],
-      input: '',
-      selected: 0,
-      alert: false
-    }
+  const [tasks, setTasks] = useState([]);
+  const [input, setInput] = useState('');
+  const [selected, setSelected] = useState(0);
+  const [alert, setAlert] = useState(false);
 
-    this.updateInput = this.updateInput.bind(this);
-    this.handleAddTask = this.handleAddTask.bind(this);
-    this.handleRemoveTask = this.handleRemoveTask.bind(this);
-    this.flipStatus = this.flipStatus.bind(this);
-    this.setSelected = this.setSelected.bind(this);
-    this.setShowToFalse = this.setShowToFalse.bind(this);
+  async function fetchTasks() {
+    // You can await here
+    const items = await fetchData('http://localhost:5000/tasks');
+    // ...
 
+    console.log(items);
+    setTasks(items);
   }
 
-  filteredTasks() {
-    return this.state.tasks.filter(OPTIONS[this.state.selected].filter);
+  useEffect(() => {
+
+    fetchTasks();
+
+  }, []);
+
+  const updateSelected = (event) => {
+
+    setSelected(event);
   }
 
-  setSelected(event) {
-    this.setState(() => {
-      return {
-        selected: event
-      };
-    });
+  const handleRemoveTask = (removedTaskId) => {
+
+    console.log('http://localhost:5000/tasks/' + removedTaskId);
+
+    deleteTask('http://localhost:5000/tasks/' + removedTaskId, tasks.filter(({ ID }) => ID === removedTaskId));
+
+    fetchTasks();
   }
 
-  handleRemoveTask(removedTask) {
-    this.setState((currentState) => {
-      return {
-        tasks: currentState.tasks.filter(({ taskName }) => taskName !== removedTask),
-      };
-    });
-  }
+  const updateInput = (event) => {
 
-  updateInput(event) {
     event.preventDefault();
     const value = event.target.value;
-    this.setState(() => {
-      return {
-        input: value
-      };
-    });
+    setInput(value);
   }
 
-  handleAddTask(event) {
+  const handleAddTask = (event) => {
     event.preventDefault();
 
-    if(this.state.input === '') {
-      this.setState(() => {
-        return {
-          alert: true
-        };
-      });
+    if(input === '') {
+      setAlert(true);
       return;
     }
 
-    this.setShowToFalse();
+    setShowToFalse();
 
-    this.setState((currentState) => {
-      return {
-        tasks: currentState.tasks.concat([
-          {
-            taskName: this.state.input,
-            complete: false
-          }
-        ]),
-        input: '',
-      };
-    });
+    addTask('http://localhost:5000/tasks', input);
+
+    setInput('');
+
+    fetchTasks();
   }
   
-  flipStatus(taskToFlip) {
+  const flipStatus = (taskToFlip) => {
     this.setState((currentState) => {
       const task = currentState.tasks.find((task) => task.taskName === taskToFlip);
       return {
@@ -112,41 +95,35 @@ class App extends React.Component {
     });
   }
 
-  setShowToFalse() {
-    this.setState(() => {
-      return {
-        alert: false
-      };
-    });
+  const setShowToFalse = () => {
+    setAlert(false);
   }
 
 
-  render() {
-    return (
-      <div className='App'>
-        <Title/>
-        <Alert
-          show={this.state.alert}
-          setShow={this.setShowToFalse}
-        />
-        <TaskForm 
-          input={this.state.input}
-          updateInput={this.updateInput}
-          handleAddTask={this.handleAddTask}
-        />
-        <NavBar
-          options={OPTIONS.map(({ name }) => name)}
-          selected={this.state.selected}
-          select={this.setSelected}
-        />
-        <TaskList
-          taskList={this.filteredTasks()}
-          flipStatus={this.flipStatus}
-          onRemoveTask={this.handleRemoveTask}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div className='App'>
+      <Title/>
+      <Alert
+        show={alert}
+        setShow={setShowToFalse}
+      />
+      <TaskForm 
+        input={input}
+        updateInput={updateInput}
+        handleAddTask={handleAddTask}
+      />
+      <NavBar
+        options={OPTIONS.map(({ name }) => name)}
+        selected={selected}
+        select={updateSelected}
+      />
+      <TaskList
+        taskList={tasks.filter(OPTIONS[selected].filter)}
+        flipStatus={flipStatus}
+        onRemoveTask={handleRemoveTask}
+      />
+    </div>
+  );
+};
 
 export default App;

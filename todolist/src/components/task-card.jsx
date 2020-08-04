@@ -5,7 +5,7 @@ function Badge({ text, bgClass }) {
   return <span className={`badge text-white float-right ${bgClass}`}>{text}</span>; 
 }
 
-function TaskCard({ taskName, complete, flipStatus, onRemoveTask }) {
+function TaskCard({ taskName, id, complete, flipStatus, onRemoveTask }) {
 
   const badgeText = (complete) => { return complete ? 'complete' : 'incomplete' };
   const badgeBgClass = (complete) => { return complete ? 'badge-success' : 'badge-warning' };
@@ -27,7 +27,7 @@ function TaskCard({ taskName, complete, flipStatus, onRemoveTask }) {
       <div>
         <button
           className="btn-remove"
-          onClick={() => onRemoveTask(taskName)}>
+          onClick={() => onRemoveTask(id)}>
           <TrashIcon/>
         </button>
       </div>
