@@ -8,12 +8,12 @@ function TaskList({ taskList, flipStatus, onRemoveTask }) {
   return (
     <div className="container">
       <ul className="todo-list">
-        {taskList.map(({ task, ID, isComplete }) => (
+        {taskList.map(({ task, id, complete }) => (
           <TaskCard
-            key={ID}
-            id={ID}
+            key={id}
+            id={id}
             taskName={task}
-            complete={isComplete}
+            complete={complete}
             flipStatus={flipStatus}
             onRemoveTask={onRemoveTask}
           />

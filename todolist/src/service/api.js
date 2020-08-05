@@ -12,8 +12,6 @@ export async function fetchData(url) {
 
   let data = await response.data;
 
-  console.log(data);
-
   return data;
 }
 
@@ -21,23 +19,18 @@ export function addTask(url, task) {
 
   axios.post(url, {
     task: task,
-    isComplete: false
+    complete: false
   });
 
 }
 
 export function deleteTask(url, task) {
 
-  fetch(url, {
-    method: 'DELETE',
-    headers: [
-      ["Content-Type", "application/json"],
-      ["Content-Type", "text/plain"]
-    ],
-    credentials: "include",
-    body: JSON.stringify(task)
-  })
-  .then(res => res.text())
-  .then(res => console.log(res));
+  
+  axios.delete(url);
 
+}
+
+export function updateTask(url, task) {
+  axios.put(url, task);
 }

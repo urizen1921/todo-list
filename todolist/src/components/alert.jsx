@@ -6,8 +6,8 @@ function Alert(props) {
 
   if(show) {
     return (
-      <div class="alert">
-        <span class="closebtn" onclick={props.setShow}></span> 
+      <div className="alert">
+        <span className="closebtn" onClick={props.setShow}></span> 
         <strong>Danger!</strong> Please, don't add a task without a description. You're not going to remember that task later.
       </div>
     );

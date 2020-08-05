@@ -14,10 +14,10 @@ function TaskCard({ taskName, id, complete, flipStatus, onRemoveTask }) {
   return(
     <li
       className="task-card"
-      key={taskName}>
+      key={id}>
       <div
         className="w-75 pointer"
-        onClick={() => flipStatus(taskName)}>
+        onClick={() => flipStatus(id)}>
         <p
           className={`font-weight-bold m-0 pl-3 d-flex justify-content-between align-items-center ${textColor(complete)}`}
         >

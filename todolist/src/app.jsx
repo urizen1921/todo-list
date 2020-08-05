@@ -5,7 +5,15 @@ import Title from './components/title.jsx';
 import NavBar from './components/navbar.jsx';
 import TaskList from './components/task-list.jsx';
 import Alert from './components/alert.jsx';
-import { fetchData, addTask, deleteTask } from './service/api.js';
+import { fetchData, addTask, deleteTask, updateTask } from './service/api.js';
+
+const URL = [
+  {
+    go: 'http://localhost:5000/tasks/',
+    java: 'http://localhost:8080/todolist/api/todoitem/'
+  }
+];
+
 
 const OPTIONS = [
   {
@@ -14,11 +22,11 @@ const OPTIONS = [
   },
   {
     name: 'Complete',
-    filter: ({ isComplete }) => isComplete === true
+    filter: ({ complete }) => complete === true
   },
   {
     name: 'Incomplete',
-    filter: ({ isComplete }) => isComplete === false
+    filter: ({ complete }) => complete === false
   }
 ]
 
@@ -28,13 +36,13 @@ const App = () => {
   const [input, setInput] = useState('');
   const [selected, setSelected] = useState(0);
   const [alert, setAlert] = useState(false);
+  const [update, setUpdate] = useState(false);
 
   async function fetchTasks() {
     // You can await here
-    const items = await fetchData('http://localhost:5000/tasks');
+    const items = await fetchData(URL[0].java);
     // ...
 
-    console.log(items);
     setTasks(items);
   }
 
@@ -42,7 +50,7 @@ const App = () => {
 
     fetchTasks();
 
-  }, []);
+  }, [update]);
 
   const updateSelected = (event) => {
 
@@ -51,11 +59,10 @@ const App = () => {
 
   const handleRemoveTask = (removedTaskId) => {
 
-    console.log('http://localhost:5000/tasks/' + removedTaskId);
+    deleteTask(URL[0].java + removedTaskId, tasks.filter(({ id }) => id === removedTaskId));
 
-    deleteTask('http://localhost:5000/tasks/' + removedTaskId, tasks.filter(({ ID }) => ID === removedTaskId));
+    setUpdate(!update);
 
-    fetchTasks();
   }
 
   const updateInput = (event) => {
@@ -75,24 +82,24 @@ const App = () => {
 
     setShowToFalse();
 
-    addTask('http://localhost:5000/tasks', input);
-
+    addTask(URL[0].java, input);
+    
     setInput('');
 
-    fetchTasks();
+    setUpdate(!update);
+    
   }
   
-  const flipStatus = (taskToFlip) => {
-    this.setState((currentState) => {
-      const task = currentState.tasks.find((task) => task.taskName === taskToFlip);
-      return {
-        tasks: currentState.tasks.filter((task) => task.taskName !== taskToFlip)
-          .concat([{
-            taskName: task.taskName,
-            complete: !task.complete
-          }]),
-      };
+  const flipStatus = (taskIdToFlip) => {
+    console.log(taskIdToFlip);
+    const task = tasks.find((task) => task.id === taskIdToFlip);
+
+    updateTask(URL[0].java + taskIdToFlip, {
+      ...task,
+      complete: !task.complete 
     });
+
+    setUpdate(!update);
   }
 
   const setShowToFalse = () => {
