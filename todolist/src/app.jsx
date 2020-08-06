@@ -36,7 +36,6 @@ const App = () => {
   const [input, setInput] = useState('');
   const [selected, setSelected] = useState(0);
   const [alert, setAlert] = useState(false);
-  const [update, setUpdate] = useState(false);
 
   async function fetchTasks() {
     // You can await here
@@ -50,18 +49,18 @@ const App = () => {
 
     fetchTasks();
 
-  }, [update]);
+
+  }, []);
 
   const updateSelected = (event) => {
 
     setSelected(event);
   }
 
-  const handleRemoveTask = (removedTaskId) => {
+  const handleRemoveTask = async (removedTaskId) => {
 
-    deleteTask(URL[0].java + removedTaskId, tasks.filter(({ id }) => id === removedTaskId));
-
-    setUpdate(!update);
+    await deleteTask(URL[0].java + removedTaskId, tasks.filter(({ id }) => id === removedTaskId));
+    fetchTasks();
 
   }
 
@@ -72,7 +71,7 @@ const App = () => {
     setInput(value);
   }
 
-  const handleAddTask = (event) => {
+  const handleAddTask = async (event) => {
     event.preventDefault();
 
     if(input === '') {
@@ -82,24 +81,24 @@ const App = () => {
 
     setShowToFalse();
 
-    addTask(URL[0].java, input);
-    
-    setInput('');
+    await addTask(URL[0].java, input);
 
-    setUpdate(!update);
+    setInput('');
+    fetchTasks();
     
   }
   
-  const flipStatus = (taskIdToFlip) => {
-    console.log(taskIdToFlip);
+  const flipStatus = async (taskIdToFlip) => {
+
     const task = tasks.find((task) => task.id === taskIdToFlip);
 
-    updateTask(URL[0].java + taskIdToFlip, {
+    await updateTask(URL[0].java + taskIdToFlip, {
       ...task,
       complete: !task.complete 
     });
 
-    setUpdate(!update);
+    fetchTasks();
+
   }
 
   const setShowToFalse = () => {

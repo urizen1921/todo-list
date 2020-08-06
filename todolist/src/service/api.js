@@ -15,22 +15,30 @@ export async function fetchData(url) {
   return data;
 }
 
-export function addTask(url, task) {
+export async function addTask(url, task) {
 
-  axios.post(url, {
-    task: task,
-    complete: false
-  });
+  let response = await axios.post(url, {
+                          task: task,
+                          complete: false
+                        });
+
+  return response;
 
 }
 
-export function deleteTask(url, task) {
+export async function deleteTask(url, task) {
 
   
-  axios.delete(url);
+  let response = await axios.delete(url);
+
+  return response;
 
 }
 
-export function updateTask(url, task) {
-  axios.put(url, task);
+export async function updateTask(url, task) {
+
+  let response = await axios.put(url, task);
+
+  return response;
+
 }
